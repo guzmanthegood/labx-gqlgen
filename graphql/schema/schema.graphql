@@ -1,0 +1,92 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  admin: AdminQuery
+}
+
+type Mutation {
+  admin: AdminMutation
+}
+
+type AdminQuery {
+  clients(filter: ClientFilter, first: Int, last: Int, before: String, after: String): ClientConnection
+}
+
+type AdminMutation{
+  createClient(input: CreateClientInput!): Client!
+}
+
+interface Node {
+  code: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+# Client
+type ClientConnection {
+  edges: [ClientEdge]
+  pageInfo: PageInfo!
+}
+
+type ClientEdge {
+  node: Client
+  cursor: String!
+}
+
+type Client implements Node{
+  code: ID!
+  clientData: ClientData
+  adviseMessage(level: [AdviseMessageLevel]): [AdviseMessage!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ClientData {
+  code: ID!
+  name: String!
+  isActive: Boolean!
+}
+
+input CreateClientInput {
+  code: String!
+  name: String!
+  isActive: Boolean!
+}
+
+input ClientFilter {
+  code: [ID]
+  name: [String!]
+  isActive: Boolean
+}
+
+# Advise message
+interface AdviseMessage {
+  code: ID!
+  description: String!
+  level: AdviseMessageLevel!
+  external: ExternalMessage
+  correlationID: ID!
+}
+
+enum AdviseMessageLevel {
+  WARN
+  ERROR
+  INFO
+}
+
+type ExternalMessage	{
+  code: String
+  message: String!
+}
+
+scalar DateTime
